@@ -1,0 +1,279 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="本系列博客将会记录与编译原理相关的知识。学习编译原理是一个非常有趣的事，同时也对一些常用的编程语言多了一些了解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译原理1.概述">
+<meta property="og:url" content="http://suyunano1.github.io/2020/09/19/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%861.%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="Nano1 Blog">
+<meta property="og:description" content="本系列博客将会记录与编译原理相关的知识。学习编译原理是一个非常有趣的事，同时也对一些常用的编程语言多了一些了解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/nano1/blog-resources/raw/master/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/1/compiler_structure.png">
+<meta property="og:image" content="https://gitee.com/nano1/blog-resources/raw/master/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/1/ast_assign.png">
+<meta property="article:published_time" content="2020-09-19T11:56:43.000Z">
+<meta property="article:modified_time" content="2020-09-22T09:51:38.081Z">
+<meta property="article:author" content="Nano1">
+<meta property="article:tag" content="计算机基础">
+<meta property="article:tag" content="编译原理">
+<meta property="article:tag" content="编程语言">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/nano1/blog-resources/raw/master/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/1/compiler_structure.png"><title>编译原理1.概述 | Nano1 Blog</title><link ref="canonical" href="http://suyunano1.github.io/2020/09/19/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%861.%E6%A6%82%E8%BF%B0/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: {"avoidBanner":false},
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.2.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Nano1 Blog</div><div class="header-banner-info__subtitle">Do you want to see moon?</div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">编译原理1.概述</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2020-09-19</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2020-09-22</span></span></div></header><div class="post-body"><p>本系列博客将会记录与编译原理相关的知识。<br>学习编译原理是一个非常有趣的事，同时也对一些常用的编程语言多了一些了解。</p>
+<a id="more"></a>
+
+        <h2 id="1-简介"   >
+          <a href="#1-简介" class="heading-link"><i class="fas fa-link"></i></a>1. 简介</h2>
+      <p>编译原理主要是学习如何处理一个含有某种规范的文本并且对它进行分析的过程。在学完一些基础知识后，你可以做一个编译器，也自己定制某种规范的文本应用到某一个特定的领域上，比如说游戏的 mod 脚本等。</p>
+<p>编译原理虽然有原理这两个字，但是我认为实践才是学好编译原理的核心。写一个自己定制语法的编程语言也是一件非常有趣的事情。</p>
+<p>本片文章会介绍编译器前端和后端并且描述它的基本结构。在学习之前，你应该会至少一款的编程语言，并且对数据结构有一定的了解（特别是树和图的结构实现与基本操作）</p>
+
+        <h2 id="2-语言处理器"   >
+          <a href="#2-语言处理器" class="heading-link"><i class="fas fa-link"></i></a>2. 语言处理器</h2>
+      
+        <h3 id="2-1-编译器"   >
+          <a href="#2-1-编译器" class="heading-link"><i class="fas fa-link"></i></a>2.1 编译器</h3>
+      <p>我们平时所编写的一些代码，被称之为源文件。源文件是不可以直接运行的（它只是一个文本文件），如果想让它运行，那么就必须要被翻译成 CPU 可识别的 <strong>二进制码</strong> 后才能在计算机上运行，而这个翻译的工作就是由 <strong>编译器(Compiler)</strong> 来完成。</p>
+
+        <h3 id="2-2-中间表示"   >
+          <a href="#2-2-中间表示" class="heading-link"><i class="fas fa-link"></i></a>2.2 中间表示</h3>
+      <p>每台计算机 CPU 的指令集都可能不太一样，指令集不一样，那么所识别的机器码也自然会有差异。如果编译器直接翻译成机器码的话，是非常繁琐复杂的，且不利于移植。假设有 N 种编译器和 M 种 不同的 CPU 指令集，就需要编写 N * M 套代码，为了解决这些问题，就设计出了 <strong>中间表示(IR intermediate representation)</strong> 。</p>
+<p>有了中间表示，编译器的工作就从原先的将源代码直接翻译成机器码，变成了先翻译成中间表示，再由中间表示 <strong>优化并翻译</strong> 成机器码。如果编译器可以共用一套中间表示，那么就从原先所需要编写 M * N 套代码变成了 M + N。</p>
+<p>中间表示一般都是 <strong>与机器无关的</strong> 抽象语言，因此也会有人称它为中间代码。</p>
+
+        <h3 id="2-3-编译器前端"   >
+          <a href="#2-3-编译器前端" class="heading-link"><i class="fas fa-link"></i></a>2.3 编译器前端</h3>
+      <p>将源代码翻译成中间表示的过程（或者程序）被称之为编译器的 <strong>前端(front end)</strong> 。</p>
+
+        <h3 id="2-4-编译器后端"   >
+          <a href="#2-4-编译器后端" class="heading-link"><i class="fas fa-link"></i></a>2.4 编译器后端</h3>
+      <p>中间表示的设计以及优化，并将中间表示翻译成机器码或者直接执行中间表示的过程（或者程序）被称之为编译器的 <strong>后端(back end)</strong> 。</p>
+
+        <h3 id="2-5-解释器"   >
+          <a href="#2-5-解释器" class="heading-link"><i class="fas fa-link"></i></a>2.5 解释器</h3>
+      <p><strong>解释器(interpreter)</strong> 与编译器不同，它并不会产生输出文件。从用户的角度上来讲，它将源程序作为输入后，会直接产生这个程序所输出的结果。</p>
+<p>对于一个源程序而言，如果它拥有相对应的输出文件（二进制码或者中间代码），那么它的运行速度就会比解释器直接解释源程序要快很多。然而，解释器并不需要编译的步骤，所以在直接运行的情况下，它的效果通常要比编译器更好一点，也不会生成大量的编译文件。</p>
+
+        <h2 id="3-编译器结构"   >
+          <a href="#3-编译器结构" class="heading-link"><i class="fas fa-link"></i></a>3. 编译器结构</h2>
+      <p>编译器是一个非常大的程序，但是如果能理解编译器的一些模块和抽象设计，那么就可以很容易的实现它。</p>
+<p>编译器的每一个模块就会产生某一个结果，再将结果传入编译器的下一个模块。编译器的大致结构如下：</p>
+<p><img src="https://gitee.com/nano1/blog-resources/raw/master/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/1/compiler_structure.png" alt="编译器结构"></p>
+
+        <h3 id="3-1-词法分析器"   >
+          <a href="#3-1-词法分析器" class="heading-link"><i class="fas fa-link"></i></a>3.1 词法分析器</h3>
+      <p>编译器可以比拟为一个翻译软件，如果想要搞清楚一个句子的含义，就必须将句子中的单词划分开来，对每一个单词进行翻译。</p>
+<p>在编译器中，划分的工作就是由 <strong>词法分析器(Lexer)</strong> 或者是 <strong>扫描器(Scanner)</strong> 来完成（都是一个意思）。词法分析器从源程序中读取字符流，并且将它们划分为有意义 <strong>记号(Token)</strong> 。</p>
+<p>Token 一般有两个固定属性，一个是种类(Kind)，表示 Token 的意思。另一个是字面量(Literal)，表示 Token 在源代码中的样子。</p>
+<p>例如，字符串 “User007” 号会被划分为一个记号。记号的种类是 Identifier，说明它是一个标识符。记号的字面量为 User007。</p>
+<p>在通常情况下，词法分析器会忽略一些无意义的字符。比如，空白符（指程序中的换行回车空格等符号）、注释等。（不一定所有词法分析器都会忽略注释，因为有一些语言有文档注释等功能）</p>
+<p>将一个源程序进行词法划分的案例：</p>
+<figure class="highlight go"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> a = <span class="number">10086</span> ;</span><br><span class="line">	<span class="built_in">print</span>(a) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>结果就会产生如下 Token （我们用 <code>\&lt;Kind,Literal\&gt;</code> 这样的方式来表示记号）：</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;FUNC,func&gt; &lt;ID,main&gt; &lt;LBRACE,&#123;&gt;</span><br><span class="line">&lt;INT,int&gt; &lt;ID,a&gt; &lt;EQ,&#x3D;&gt; &lt;INTEGER_NUMBER,10086&gt; &lt;SEMI,;&gt;</span><br><span class="line">&lt;ID,print&gt; &lt;LPAREN,(&gt; &lt;ID,a&gt; &lt;RPAREN,)&gt; &lt;SEMI,;&gt;</span><br><span class="line">&lt;RBRACE,&#125;&gt;</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><strong>Note:</strong> Token 的直译翻译为记号。在很多时候，这个翻译都不是能很好的表达意思。所以它有时会被翻译为词法单元或者是单词符号等。</p>
+</blockquote>
+
+        <h3 id="3-2-语法分析器"   >
+          <a href="#3-2-语法分析器" class="heading-link"><i class="fas fa-link"></i></a>3.2 语法分析器</h3>
+      <p>词法分析器所产生的单词符号会作为输入到 <strong>语法分析器(Parser)</strong> 。语法分析器的主要目的是按 <strong>定制的语法规则</strong> 去检测源程序的语法是否正确，并且产生一个树形的中间表示。</p>
+<p>那么如何定制语法规则呢？可以先通过 <strong>BNF（巴科斯范式）</strong> 或者 <strong>上下文无关文法</strong> 来定制语法规则。</p>
+<p>例如用扩展的 BNF 定制一个简单的赋值语句规则：</p>
+<figure class="highlight"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">assign := ID &quot;=&quot; expression()</span><br><span class="line">expression := (&quot;+&quot; | &quot;-&quot; | &quot;*&quot; | &quot;/&quot;) (ID | NUMBER)</span><br></pre></td></tr></table></div></figure>
+
+<p>其中 <code>|</code> 表示或者，<code>(a | b)</code> 就表示匹配 a 或者 b 。<br>ab 表示将 a 和 b 串联起来，先匹配 a 在匹配 b 。<br>从语法上看，这很像正则表达式，但实际上还是要有所区分的，正则表达式并不能递归的调用匹配，而巴克斯范式可以有类似于 <code>a := ba</code> 的递归操作。</p>
+<p>assign 和 expression 被称之为 <strong>非终结符</strong>，而 := 号的右边则是相对应左边的语法规则。ID、NUMBER还有双引号内的字符都是 <strong>终结符</strong> 。</p>
+<p>你可以简单的把终结符理解成 Token ，表示实质性的字符。非终结符理解成某一个语法规则。</p>
+<p>我们尝试编写一个简单的语法分析器实现上面 BNF 所定制的语法：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// match 函数表示匹配 expecteds（参数） 中的任意一个 Kind。</span></span><br><span class="line"><span class="comment">// 如果匹配成功就读取下一个，否则报错。</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">match</span><span class="params">(TokenKind... expecteds)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(TokenKind kind : expecteds) &#123;</span><br><span class="line">		<span class="comment">// curTok 表示当前读取到的 Token</span></span><br><span class="line">		<span class="keyword">if</span>(curTok.kind == kind) &#123;</span><br><span class="line">			<span class="comment">// 去读取下一个</span></span><br><span class="line">			next() ;</span><br><span class="line">			<span class="keyword">return</span> ;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 报错，表示匹配失败</span></span><br><span class="line">	error();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 匹配赋值语句</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">parseAssignStatment</span><span class="params">()</span></span>&#123;</span><br><span class="line">	match(ID) ;</span><br><span class="line">	match(EQ) ;</span><br><span class="line">	parseExpression() ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 匹配简单表达式</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">parseExpression</span><span class="params">()</span></span>&#123;</span><br><span class="line">	match(NUMBER,ID) ;</span><br><span class="line">	match(PLUS,MINUS,STAR,SLASH) ;</span><br><span class="line">	match(NUMBER,ID) ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<p>上面的程序是用的 <strong>递归下降分析器</strong> 来实现语法分析的，它可以匹配类似如下表达式：<br>a = 15 + b<br>v = r / t<br>…</p>
+<p>我们已经完成了一个简单的语法分析器，但是这个程序有一个缺陷，就是只能检验源程序是否含有语法错误，它没有产生任何与源程序相关的输出，也没有保存源程序中的信息。通常情况下语法分析器都会输出一个树形的中间表示（此中间表示并非前面所述的 IR）供接下来的语义分析和中间代码生成器遍历。</p>
+<p>最常见的树形中间表示就是 <strong>抽象语法树(Abstract Syntax Tree)</strong> 。<br>抽象语法树并非二叉树，而是节点类型可能不同的 N 叉树。例如，赋值语句 <code>a = b + 20 * c</code> 的抽象语法树如下：</p>
+<p><img src="https://gitee.com/nano1/blog-resources/raw/master/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/1/ast_assign.png" alt="a = b + 20 * c 的AST"></p>
+<p>如果你对树形结构很了解的话，应该很容易遍历这颗树来还原这个赋值语句。</p>
+<p>我也会在语法分析的文章中去详细的讲解 AST 和它的生成与遍历。</p>
+
+        <h3 id="3-3-语义分析"   >
+          <a href="#3-3-语义分析" class="heading-link"><i class="fas fa-link"></i></a>3.3 语义分析</h3>
+      <p><strong>语义分析(Semantic Analysis)</strong> 是专门用来检测程序是否含有语义上的错误。它接收语法分析生成出来的树形表示，并且进行遍历。在遍历的过程中根据节点类型去收集或者查询符号信息。一个复杂的语义分析器可能会进行多次遍历。</p>
+<p>符号信息是指在源程序中声明的变量或者是函数等信息。</p>
+<p><strong>符号表(Symbol Table)</strong> 用于专门收集这些符号信息，并且你可以通过符号的唯一标识来查询到这些信息（通常都是这些符号的名字）。一般来说，符号表都与 <strong>作用域(Scope)</strong> 相关联。如果在一个作用域里定义了多个变量或者函数，那么这些符号信息就会被所在的作用域的符号表搜集。</p>
+<p>符号表的查询操作与作用域相关。你在编写函数时，函数内的代码是可以引用函数外的变量以及其他函数的。想要实现这个查询操作，就需要将作用域之间进行链接，函数作用域可以引用到函数外层的作用域（通常是全局作用域）。</p>
+<p>查询变量伪代码：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scope</span> </span>&#123;</span><br><span class="line">	Scope outer </span><br><span class="line">	HashMap symbolTable</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">	<span class="function">VarSymbol <span class="title">lookupVar</span><span class="params">(name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> symbolTable.contains(name) &#123;</span><br><span class="line">			<span class="keyword">return</span> symbolTable.get(name)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> outer != <span class="keyword">null</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> outer.lookupVar(name)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+<p>语义分析不仅要收集符号，还要检测符号的正确性。比如说在同一作用域里是否存在多个相同名称的变量或者函数等（如果编程语言支持重载函数的话，那么函数的检测和查询操作会更复杂一点）。</p>
+<p>类型检测和自动转型（自动类型提升）也是语义分析的工作。例如，检测赋值类型是否正确、运算符所操作的操作数是否合法等。如果是面向对象的编程语言，在类型检测时和自动转型时，还需要考虑面向对象的多态特征。</p>
+
+        <h3 id="3-4-中间代码生成"   >
+          <a href="#3-4-中间代码生成" class="heading-link"><i class="fas fa-link"></i></a>3.4 中间代码生成</h3>
+      <p>在语法分析和语义分析完成之后，编译器就要开始生成中间代码了。中间代码一般都是比较接近机器码的代码，因为这样容易从中间代码生成为机器码。常见的中间代码设计有 <strong>三地址代码</strong> 和 <strong>四元式</strong>。</p>
+<p>有一些编译器并没有中间代码，它们直接从抽象语法树转换为机器码。</p>
+
+        <h3 id="3-5-目标代码生成"   >
+          <a href="#3-5-目标代码生成" class="heading-link"><i class="fas fa-link"></i></a>3.5 目标代码生成</h3>
+      <p>将中间代码部分转换为机器码的机器称之为 <strong>代码生成器</strong> 。中间代码一般并不会直接生成二进制代码，在大多数情况下都是先生成汇编，再由 <strong>汇编器/链接器</strong> 生成二进制代码。</p>
+<p>对于目标代码生成，工作量其实是很大的，一般在学习编译原理的过程中都会根据自己电脑的 CPU 指令集生成代码。生成汇编代码也需要你有汇编的知识，在生成汇编代码中，对于寄存器的使用也是非常重要的。</p>
+
+        <h3 id="3-6-优化"   >
+          <a href="#3-6-优化" class="heading-link"><i class="fas fa-link"></i></a>3.6 优化</h3>
+      <p>在上文中我并没有提到优化的概念，这并不意味着优化并不重要。对于一个有优化的编译器和没有优化的编译器，相同的代码可能会含有数倍的性能差距！</p>
+<p>优化存在于编译器的各个阶段。比如去设计优化器去优化中间表示或者是汇编语言，甚至是链接后的代码。</p>
+<p>优化在编译器中非常重要，一些编译器甚至会进行多次优化。</p>
+<p>源代码</p>
+<figure class="highlight go"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">write</span><span class="params">(newData)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> DEBUG &#123; <span class="comment">// false</span></span><br><span class="line">		<span class="built_in">println</span>(newData.SimpleInfo)</span><br><span class="line">	&#125;</span><br><span class="line">	buf += newData.size </span><br><span class="line">	<span class="keyword">if</span> buf.size * <span class="number">2</span> &gt; <span class="number">1024</span> * <span class="number">128</span> &#123;</span><br><span class="line">		o.write(newData)</span><br><span class="line">		o.flush()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>会被优化成（只是直观感受）：</p>
+<figure class="highlight go"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">write</span><span class="params">(newData)</span></span> &#123;</span><br><span class="line">	buf += newData.size</span><br><span class="line">	<span class="keyword">if</span> buf.size + buf.size &gt; <span class="number">131027</span> &#123;</span><br><span class="line">		o.write(newData)</span><br><span class="line">		o.flush()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>代码优化不止是这些，还有活跃分析、函数内联、控制流分析、SSA…</p>
+
+        <h2 id="4-语言范式"   >
+          <a href="#4-语言范式" class="heading-link"><i class="fas fa-link"></i></a>4. 语言范式</h2>
+      <p>现代语言具有不同的编程范式。面向对象、函数式、过程式、声明式…每个语言可能具有多种不同的范式。学习多种不同范式的语言能够更好的体会到计算机语言之间的差异以及计算机语言所带来的魅力。</p>
+
+        <h2 id="5-如何学习"   >
+          <a href="#5-如何学习" class="heading-link"><i class="fas fa-link"></i></a>5. 如何学习</h2>
+      <p>我们可以阅读书籍或者阅读开源编译器的源码进行学习。网上也有大量的视频教程。我个人比较推荐的书籍：</p>
+<ol>
+<li>编程语言实现模式(Language Implemention Patterns)</li>
+<li>自制编译器（用 Java 写的）</li>
+</ol>
+<p>进阶的话…就编译原理（龙书）、现代编译原理（虎书）还有 Sicp 吧。</p>
+<p>阅读源码的话，你喜欢什么语言就看它的编译器源码吧。这里我推荐 Go 的编译器源码。</p>
+<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/golang/go/tree/master/src/go" >Go 语言源码Github地址</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+
+        <h2 id="6-最后"   >
+          <a href="#6-最后" class="heading-link"><i class="fas fa-link"></i></a>6. 最后</h2>
+      <p>如果文章存在错误或者有不足的地方，请指出！</p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://SuyuNano1.github.io">Nano1</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://suyunano1.github.io/2020/09/19/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%861.%E6%A6%82%E8%BF%B0/">http://suyunano1.github.io/2020/09/19/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%861.%E6%A6%82%E8%BF%B0/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://suyunano1.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://suyunano1.github.io/tags/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/">编译原理</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://suyunano1.github.io/tags/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a></span></div><nav class="post-paginator paginator"></nav></footer></div></div><div class="comments" id="comments"><div id="utterances-container"></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">
+          1. 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">
+          2. 语言处理器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%BC%96%E8%AF%91%E5%99%A8"><span class="toc-number">2.1.</span> <span class="toc-text">
+          2.1 编译器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E4%B8%AD%E9%97%B4%E8%A1%A8%E7%A4%BA"><span class="toc-number">2.2.</span> <span class="toc-text">
+          2.2 中间表示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%BC%96%E8%AF%91%E5%99%A8%E5%89%8D%E7%AB%AF"><span class="toc-number">2.3.</span> <span class="toc-text">
+          2.3 编译器前端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E7%BC%96%E8%AF%91%E5%99%A8%E5%90%8E%E7%AB%AF"><span class="toc-number">2.4.</span> <span class="toc-text">
+          2.4 编译器后端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E8%A7%A3%E9%87%8A%E5%99%A8"><span class="toc-number">2.5.</span> <span class="toc-text">
+          2.5 解释器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%BC%96%E8%AF%91%E5%99%A8%E7%BB%93%E6%9E%84"><span class="toc-number">3.</span> <span class="toc-text">
+          3. 编译器结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90%E5%99%A8"><span class="toc-number">3.1.</span> <span class="toc-text">
+          3.1 词法分析器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90%E5%99%A8"><span class="toc-number">3.2.</span> <span class="toc-text">
+          3.2 语法分析器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E8%AF%AD%E4%B9%89%E5%88%86%E6%9E%90"><span class="toc-number">3.3.</span> <span class="toc-text">
+          3.3 语义分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E4%B8%AD%E9%97%B4%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90"><span class="toc-number">3.4.</span> <span class="toc-text">
+          3.4 中间代码生成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-%E7%9B%AE%E6%A0%87%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90"><span class="toc-number">3.5.</span> <span class="toc-text">
+          3.5 目标代码生成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-%E4%BC%98%E5%8C%96"><span class="toc-number">3.6.</span> <span class="toc-text">
+          3.6 优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%AD%E8%A8%80%E8%8C%83%E5%BC%8F"><span class="toc-number">4.</span> <span class="toc-text">
+          4. 语言范式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0"><span class="toc-number">5.</span> <span class="toc-text">
+          5. 如何学习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%9C%80%E5%90%8E"><span class="toc-number">6.</span> <span class="toc-text">
+          6. 最后</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="https://gitee.com/nano1/blog-resources/raw/master/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">hello world.</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">1</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">1</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">3</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2020</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Nano1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax@latest/pjax.min.js"></script><script>window.addEventListener('DOMContentLoaded', function () {
+  var pjax = new Pjax({"selectors":["head title","#main",".pjax-reload"],"history":true,"scrollTo":false,"scrollRestoration":false,"cacheBust":false,"debug":false,"currentUrlFullReload":false,"timeout":0});
+  // 加载进度条的计时器
+  var loadingTimer = null;
+
+  // 重置页面 Y 方向上的滚动偏移量
+  document.addEventListener('pjax:send', function () {
+    $('.header-nav-menu').removeClass('show');
+    if (CONFIG.pjax && CONFIG.pjax.avoidBanner) {
+      $('html').velocity('scroll', {
+        duration: 500,
+        offset: $('#header').height(),
+        easing: 'easeInOutCubic'
+      });
+    }
+
+    var loadingBarWidth = 20;
+    var MAX_LOADING_WIDTH = 95;
+
+    $('.loading-bar').addClass('loading');
+    $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    clearInterval(loadingTimer);
+    loadingTimer = setInterval(function () {
+      loadingBarWidth += 3;
+      if (loadingBarWidth > MAX_LOADING_WIDTH) {
+        loadingBarWidth = MAX_LOADING_WIDTH;
+      }
+      $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    }, 500);
+  }, false);
+
+  window.addEventListener('pjax:complete', function () {
+    clearInterval(loadingTimer);
+    $('.loading-bar__progress').css('width', '100%');
+    $('.loading-bar').removeClass('loading');
+    setTimeout(function () {
+      $('.loading-bar__progress').css('width', '0');
+    }, 400);
+    $('link[rel=prefetch], script[data-pjax-rm]').each(function () {
+      $(this).remove();
+    });
+    $('script[data-pjax], #pjax-reload script').each(function () {
+      $(this).parent().append($(this).remove());
+    });
+
+    if (Stun.utils.pjaxReloadBoot) {
+      Stun.utils.pjaxReloadBoot();
+    }
+    if (Stun.utils.pjaxReloadScroll) {
+      Stun.utils.pjaxReloadScroll();
+    }
+    if (Stun.utils.pjaxReloadSidebar) {
+      Stun.utils.pjaxReloadSidebar();
+    }
+    if (false) {
+      if (Stun.utils.pjaxReloadHeader) {
+        Stun.utils.pjaxReloadHeader();
+      }
+      if (Stun.utils.pjaxReloadScrollIcon) {
+        Stun.utils.pjaxReloadScrollIcon();
+      }
+      if (Stun.utils.pjaxReloadLocalSearch) {
+        Stun.utils.pjaxReloadLocalSearch();
+      }
+    }
+  }, false);
+}, false);</script><div id="pjax-reload"></div><script data-pjax="">function loadUtterances() {
+  var d = document, s = d.createElement('script');
+  var container = d.getElementById('utterances-container');
+
+  if (!container) {
+    return;
+  }
+  s.src = 'https://utteranc.es/client.js';
+  s.setAttribute('repo', 'SuyuNano1/SuyuNano1.github.io');
+  s.setAttribute('issue-term', 'title');
+  s.setAttribute('label', 'utterances');
+  s.setAttribute('theme', 'github-light');
+  s.setAttribute('crossorigin', 'anonymous');
+  s.setAttribute('async', '');
+  if (true) {
+    s.setAttribute('data-pjax-rm', '');
+  }
+  container.append(s);
+}
+
+if (true) {
+  loadUtterances();
+} else {
+  window.addEventListener('DOMContentLoaded', loadUtterances, false);
+}</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script></body></html>
